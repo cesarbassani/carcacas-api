@@ -4,17 +4,14 @@ import cv2
 import numpy as np
 from datetime import datetime
 import logging
-from .utils.detector import CarcassDetector
-from .config import settings
+from app.utils.detector import CarcassDetector
+from app.config import settings
 
 # Configurar logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI(
-    title=settings.PROJECT_NAME,
-    openapi_url=f"{settings.API_V1_STR}/openapi.json"
-)
+app = FastAPI(title="Carcass Detection API")
 
 # CORS
 app.add_middleware(
