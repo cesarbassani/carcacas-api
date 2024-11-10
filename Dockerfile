@@ -19,4 +19,5 @@ COPY . .
 ENV PORT=8000
 ENV MODEL_PATH=/app/app/models/best.pt
 
-CMD uvicorn app.main:app --host 0.0.0.0 --port $PORT
+# Comando para iniciar a aplicação
+CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT}
