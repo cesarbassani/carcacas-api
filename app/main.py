@@ -119,18 +119,23 @@ async def detect_carcass(
         result = detector.detect(image)
         process_time = time.time() - start_time
         
-        # Adicionar metadados
+        # Adicionar metadados expandidos
         result["metadata"] = {
             "process_time": process_time,
             "image_size": {
                 "width": image.shape[1],
                 "height": image.shape[0]
             },
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
+            "file_info": {
+                "filename": file.filename,
+                "content_type": file.content_type,
+                "file_size": len(contents)
+            }
         }
         
         return result
-        
+            
     except HTTPException as e:
         raise e
     except Exception as e:
@@ -147,5 +152,6 @@ async def global_exception_handler(request: Request, exc: Exception):
     return {
         "error": "Internal server error",
         "detail": str(exc),
-        "path": request.url.path
+        "path": request.url.path,
+        "timestamp": datetime.now().isoformat()
     }

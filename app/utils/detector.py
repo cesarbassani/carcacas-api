@@ -8,9 +8,14 @@ from typing import List, Dict, Any
 logger = logging.getLogger(__name__)
 
 class CarcassDetector:
-    def __init__(self, model_path: str):
+    # Lista de classes que o modelo pode detectar
+    CLASS_NAMES = ["carcaca"]  # Adicionado aqui
+
+    def __init__(self, model_path: str, conf_threshold: float = 0.7):
         self.model_path = model_path
+        self.conf_threshold = conf_threshold
         self.model = None
+        self.model_version = "YOLOv8"  # Adicionado aqui
         self.load_model()
 
     def load_model(self) -> None:
@@ -30,20 +35,26 @@ class CarcassDetector:
         """Detecta carcaças na imagem"""
         try:
             # Fazer predição
-            results = self.model(image, conf=0.7)[0]
+            results = self.model(image, conf=self.conf_threshold)[0]
             
             detections = []
             for r in results.boxes.data.tolist():
                 x1, y1, x2, y2, conf, cls = r
                 detections.append({
-                    "bbox": [float(x) for x in [x1, y1, x2, y2]],
+                    "bbox": [int(x) for x in [x1, y1, x2, y2]],  # Convertido para inteiros
                     "confidence": float(conf),
-                    "class": int(cls)
+                    "class": int(cls),
+                    "class_name": self.CLASS_NAMES[int(cls)]  # Adicionado nome da classe
                 })
             
             return {
                 "detected": len(detections) > 0,
-                "detections": detections
+                "detections": detections,
+                "model_info": {  # Adicionado informações do modelo
+                    "version": self.model_version,
+                    "confidence_threshold": self.conf_threshold,
+                    "model_path": str(self.model_path)
+                }
             }
             
         except Exception as e:
